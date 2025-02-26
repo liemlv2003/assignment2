@@ -12,6 +12,9 @@
     <body>
         <div class="container p-3">
             <h1>Quizzes</h1>
+            <a href="/question/questions" class="btn btn-primary mb-3"
+                >Back to question</a
+            >
             <a href="/quizz/new" class="btn btn-primary mb-3"
                 >Create New Quiz</a
             >
@@ -31,24 +34,40 @@
             </div>
         </div>
         <script>
-            const deleteButtons = document.querySelectorAll(".btn-danger");
-            deleteButtons.forEach((button) => {
-                button.addEventListener("click", async (e) => {
-                    const href = e.target.parentElement.querySelector("a").href;
-                    const url = new URL(href);
-                    const quizId = url.searchParams.get("id");
-                    const response = await fetch(
-                        `http://localhost:3000/api/quizzes/${quizId}`,
-                        {
-                            method: "DELETE",
+            document.addEventListener("DOMContentLoaded", () => {
+                const deleteButtons = document.querySelectorAll(".btn-danger");
+        
+                deleteButtons.forEach((button) => {
+                    button.addEventListener("click", async (e) => {
+                        e.preventDefault(); // Ngăn chặn hành vi mặc định nếu nút nằm trong thẻ <a> hoặc <form>
+        
+                        const isConfirmed = window.confirm("Bạn có chắc chắn muốn xóa không?");
+                        if (!isConfirmed) return; // Nếu người dùng nhấn "Hủy", dừng xử lý
+        
+                        const href = e.target.parentElement.querySelector("a").href;
+                        const url = new URL(href);
+                        const quizId = url.searchParams.get("id");
+        
+                        try {
+                            const response = await fetch(`http://localhost:3000/api/quizzes/${quizId}`, {
+                                method: "DELETE",
+                            });
+        
+                            if (response.ok) {
+                                alert("Xóa thành công!");
+                                window.location.reload();
+                            } else {
+                                alert("Xóa thất bại, vui lòng thử lại.");
+                            }
+                        } catch (error) {
+                            alert("Đã xảy ra lỗi, vui lòng thử lại.");
+                            console.error("Lỗi khi xóa:", error);
                         }
-                    );
-                    if (response.ok) {
-                        window.location.reload();
-                    }
+                    });
                 });
             });
         </script>
+        
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
